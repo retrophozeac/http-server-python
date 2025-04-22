@@ -8,7 +8,14 @@ def main():
     # Uncomment this to pass the first stage
     #
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
-    server_socket.accept() # wait for client
+    
+    connection, address = server_socket.accept() # wait for client
+
+    with connection:
+        print(f"Connected by {address}")
+        connection.sendall(b"HTTP/1.1 200 OK\r\n")
+        connection.close()
+
 
 
 if __name__ == "__main__":
