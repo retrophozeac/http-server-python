@@ -13,7 +13,7 @@ def main():
 
     with connection:
         print(f"Connected by {address}")
-        connection.sendall(b"HTTP/1.1 200 OK\r\n")
+        connection.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
         connection.close()
 
 
