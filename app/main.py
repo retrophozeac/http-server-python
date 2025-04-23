@@ -39,9 +39,9 @@ def handle_client(connection):
                 filename = target.split("/files/")[1]
                 directory = sys.argv[2]
                 body = request_data[-1]
-                with open(filename, "w") as file:
-                    file.write(body.decode())
-                response = f"HTTP/1.1 201 Created\r\n\r\n"
+                with open(f"/{directory}/{filename}", "w") as file:
+                    file.write(body)
+                response = b"HTTP/1.1 201 Created\r\n\r\n"
             else:
                 response = b"HTTP/1.1 404 Not Found\r\n\r\n"    
 
