@@ -1,6 +1,6 @@
 import socket
 import threading
-
+import sys
 
 def handle_client(connection):
     try:
@@ -22,6 +22,16 @@ def handle_client(connection):
             header = header.strip()
             value1 = value1.strip()
             response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(value1)}\r\n\r\n{value1}".encode()
+        elif target.startswith("/files/"):
+            filename = target.split("/files/")[1]
+            directory = sys.argv[2]
+            print(filename)
+            try:
+                with open(f"/{directory}/{filename}", "r") as file:
+                    content = file.read()
+                response = f"HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: {len(content)}\r\n\r\n{content}".encode()
+            except FileNotFoundError:
+                response = b"HTTP/1.1 404 Not Found\r\n\r\n"
         else:
             response = b"HTTP/1.1 404 Not Found\r\n\r\n"
 
