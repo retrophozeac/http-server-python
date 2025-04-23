@@ -10,13 +10,15 @@ def main():
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     
     connection, address = server_socket.accept() # wait for client
-
-    with connection:
-        print(f"Connected by {address}")
+    data = connection.recv(1024)
+    request_line = data.decode().splitlines()[0]
+    method, path, _ = request_line.split()
+    if path == "/":
         connection.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
         connection.close()
-
-
-
+    else:
+        connection.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
+        connection.close()
+        
 if __name__ == "__main__":
     main()
