@@ -11,14 +11,19 @@ def main():
     
     connection, address = server_socket.accept() # wait for client
     data = connection.recv(1024)
-    request_line = data.decode().splitlines()[0]
-    method, path, _ = request_line.split()
-    if path == "/":
-        connection.sendall(b"HTTP/1.1 200 OK\r\n\r\n")
-        connection.close()
+    request_data = data.decode().split("\r\n")
+    request_line = request_data[0]
+    method, target, http_version = request_line.split()
+
+    if target == "/":
+        response = b"HTTP/1.1 200 OK\r\n\r\n"
+    elif target.startswith("/echo/"):
+        value = target.split("/echo/")[1]
+        response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(value)}\r\n\r\n{value}".encode()
     else:
-        connection.sendall(b"HTTP/1.1 404 Not Found\r\n\r\n")
-        connection.close()
-        
+        response = b"HTTP/1.1 404 Not Found\r\n\r\n"
+
+    connection.sendall(response)
+
 if __name__ == "__main__":
     main()
