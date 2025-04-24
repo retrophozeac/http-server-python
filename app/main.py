@@ -3,6 +3,7 @@ import threading
 import sys
 import os
 from pathlib import Path
+import gzip
 
 
 class HttpRequest:
@@ -44,6 +45,7 @@ class HttpResponse:
         self.status_code = status_code
         self.content = content
         self.content_type = content_type
+        self.gzip_content: str = None
         self.headers = {}
 
     def add_header(self, name, value):
@@ -66,6 +68,8 @@ class HttpResponse:
         )
         for name, value in self.headers.items():
             headers += f"{name}: {value}\r\n"
+        if self.gzip_content:
+            return f"{response_line}{headers}\r\n{self.gzip_content}".encode("utf-8")
         return f"{response_line}{headers}\r\n{self.content}".encode("utf-8")
 
 
@@ -141,6 +145,7 @@ class HttpServer:
                 response = self._route_request(request)
                 if encoding_header and "gzip" in encoding_header:
                     response.add_header("Content-Encoding", "gzip")
+                    response.gzip_content = gzip.compress(request.path.split("/echo/")[1].encode())
                 if connection_header and connection_header.lower() == "close":
                     response.add_header("Connection","close")
                     connection.sendall(response.create_response())
