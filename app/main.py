@@ -27,6 +27,9 @@ class HttpRequest:
                 break
             elif ":" in line:
                 header, value = line.split(": ", 1)
+                if header =="Accept-Encoding":
+                    values = value.split(",")
+                    self.headers[header] = [v.strip() for v in values]
                 self.headers[header] = value.strip()
         body_start_index = self.request.find("\r\n\r\n")
         if body_start_index != -1:
