@@ -134,7 +134,10 @@ class HttpServer:
                     return
                 request = HttpRequest(data)
                 connection_header = request.get_header("Connection")
+                encoding_header = request.get_header("Accept-Encoding")
                 response = self._route_request(request)
+                if encoding_header and "gzip" in encoding_header:
+                    response.add_header("Content-Encoding", "gzip")
                 if connection_header and connection_header.lower() == "close":
                     response.add_header("Connection","close")
                     connection.sendall(response.create_response())
